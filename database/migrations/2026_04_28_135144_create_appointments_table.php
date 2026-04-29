@@ -20,6 +20,7 @@ return new class extends Migration
         $table->text('notes')->nullable();
         $table->enum('statut', ['en_attente', 'confirme', 'annule'])->default('en_attente');
         $table->timestamps();
+        $table->foreignId('medecin_id')->constrained()->onDelete('cascade');
     });
 }
 

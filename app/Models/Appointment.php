@@ -16,4 +16,11 @@ class Appointment extends Model
     {
         return $this->belongsTo(Patient::class);
     }
+    /**
+ * RELATION : Le rendez-vous appartient à un médecin
+ */
+public function medecin()
+{
+    return $this->belongsTo(Medecin::class);
+}
 }
