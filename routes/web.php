@@ -24,4 +24,19 @@ Route::put('/modifier-rdv/{id}', [AppointmentController::class, 'update']);
 // Affiche la page avec la liste
 Route::get('/medecins', [MedecinController::class, 'index']);
 // Enregistre un nouveau médecin via le formulaire
-Route::post('/ajouter-medecin', [MedecinController::class, 'store']);
+// Route pour ajouter un médecin
+Route::post('/ajouter-medecin', [MedecinController::class, 'store'])->name('medecins.store');
+
+// Route pour enregistrer un patient
+Route::post('/patients/store', [PatientController::class, 'store'])->name('patients.store');
+
+// Route pour la liste des patients
+Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+
+// Groupe de routes protégées (Optionnel pour l'instant si tu n'as pas configuré l'auth)
+Route::middleware(['auth'])->group(function () {
+    // Tes routes protégées ici
+});
+use App\Http\Controllers\DashboardController;
+
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

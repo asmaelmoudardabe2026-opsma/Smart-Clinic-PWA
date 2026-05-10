@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Medecin extends Model
 {
-    // On autorise Laravel à remplir ces colonnes
-    protected $fillable = ['nom', 'specialite', 'telephone'];
+    use HasFactory;
 
-    /**
-     * RELATION : Un médecin possède plusieurs rendez-vous
-     * C'est ici qu'on définit le "1..*" de ton diagramme
-     */
+    protected $fillable = ['nom', 'prenom', 'specialite', 'telephone', 'email'];
+
+    // Un médecin a plusieurs rendez-vous
     public function appointments()
     {
         return $this->hasMany(Appointment::class);

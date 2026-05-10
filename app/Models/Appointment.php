@@ -9,18 +9,22 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['patient_id', 'date_heure', 'motif', 'notes', 'statut'];
+    // Ajout de medecin_id pour permettre l'enregistrement
+    protected $fillable = ['patient_id', 'medecin_id', 'date_heure', 'motif', 'notes', 'statut'];
 
-    // Relation : Un rendez-vous appartient à un patient
+    /**
+     * RELATION : Un rendez-vous appartient à un patient
+     */
     public function patient()
     {
         return $this->belongsTo(Patient::class);
     }
+
     /**
- * RELATION : Le rendez-vous appartient à un médecin
- */
-public function medecin()
-{
-    return $this->belongsTo(Medecin::class);
-}
+     * RELATION : Le rendez-vous appartient à un médecin
+     */
+    public function medecin()
+    {
+        return $this->belongsTo(Medecin::class);
+    }
 }

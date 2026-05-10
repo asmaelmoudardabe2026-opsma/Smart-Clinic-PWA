@@ -2,61 +2,58 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\Patient;
+use App\Models\Medecin;
+use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
-    // 1. Liste des rendez-vous
+    /**
+     * Affiche la page des rendez-vous avec les listes nécessaires.
+     */
     public function index()
     {
-        $appointments = Appointment::with('patient')->get();
+        // On récupère tout pour remplir la page
         $patients = Patient::all();
-        return view('appointments', compact('appointments', 'patients'));
+        $medecins = Medecin::all();
+        
+        // On récupère les RDV avec leurs relations pour éviter les erreurs dans le tableau
+        $appointments = Appointment::with(['patient', 'medecin'])->orderBy('date_heure', 'asc')->get();
+
+        return view('rdv', compact('patients', 'medecins', 'appointments'));
     }
 
-    // 2. Enregistrement d'un nouveau RDV
+    /**
+     * Enregistre un nouveau rendez-vous.
+     */
     public function store(Request $request)
     {
-        $request->validate([
+        // 1. Validation (La partie "Sécurité" pour ton PFE)
+        $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'date_heure' => 'required|after:now',
-            'motif' => 'required|string|min:5',
+            'medecin_id' => 'required|exists:medecins,id',
+            'date_heure' => 'required|date|after:now',
+            'motif'      => 'required|string|max:255',
+            'notes'      => 'nullable|string',
         ]);
 
-        Appointment::create($request->all());
-        return redirect()->back()->with('success', 'Rendez-vous ajouté avec succès !');
+        // 2. Création en base de données
+        // Grâce au $fillable que tu as corrigé, medecin_id sera bien enregistré
+        Appointment::create($validated);
+
+        // 3. Redirection avec message de succès
+        return redirect()->route('appointments.index')->with('success', 'Rendez-vous enregistré avec succès !');
     }
 
-    // 3. Affichage du formulaire de modification
-    public function edit($id)
-    {
-        $appointment = Appointment::findOrFail($id);
-        $patients = Patient::all();
-        return view('edit_appointment', compact('appointment', 'patients'));
-    }
-
-    // 4. Mise à jour des données modifiées
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'date_heure' => 'required|after:now',
-            'motif' => 'required|string|min:5',
-        ]);
-
-        $appointment = Appointment::findOrFail($id);
-        $appointment->update($request->all());
-
-        return redirect('/rendez-vous')->with('success', 'Rendez-vous mis à jour avec succès !');
-    }
-
-    // 5. Suppression
+    /**
+     * Supprimer un rendez-vous (Optionnel, mais bien pour le CRUD)
+     */
     public function destroy($id)
     {
         $appointment = Appointment::findOrFail($id);
         $appointment->delete();
+
         return redirect()->back()->with('success', 'Rendez-vous annulé.');
     }
 }

@@ -1,70 +1,96 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Patients - Smart Clinic</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+@extends('layouts.app')
 
-    <div class="container mt-5">
-        <h1 class="mb-4 text-center">Liste des Patients - Smart Clinic</h1>
+@section('content')
+<div class="container mt-5">
+    <!-- 1. En-tête de la page -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary"><i class="fas fa-user-medical"></i> Gestion des Patients - Smart Clinic</h2>
+    </div>
 
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+    <!-- 2. Affichage des messages de succès -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Succès !</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-        <div class="card card-body mb-4 shadow-sm">
-            <h3 class="h5 mb-3">Ajouter un nouveau patient</h3>
-            <form action="/ajouter-patient" method="POST">
-                @csrf
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <input type="text" name="nom_complet" class="form-control" placeholder="Nom complet" required>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" name="telephone" class="form-control" placeholder="Téléphone" required>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="date" name="date_naissance" class="form-control" required>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Enregistrer</button>
-                    </div>
+    <div class="row">
+        <!-- 3. Formulaire d'Ajout (Partie Gauche) -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Nouveau Patient</h5>
                 </div>
-            </form>
+                <div class="card-body">
+                    <form action="{{ route('patients.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="nom" class="form-control @error('nom') is-invalid @enderror" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" name="prenom" class="form-control @error('prenom') is-invalid @enderror" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Téléphone</label>
+                            <input type="text" name="telephone" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Enregistrer le Patient</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Nom</th>
-                            <th>Téléphone</th>
-                            <th>Date de Naissance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($patients as $patient)
-                            <tr>
-                                <td>{{ $patient->nom_complet }}</td>
-                                <td>{{ $patient->telephone }}</td>
-                                <td>{{ $patient->date_naissance }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center text-muted">Aucun patient enregistré pour le moment.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <!-- 4. Liste des Patients (Partie Droite) -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Dossiers Patients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Contact</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($patients as $patient)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $patient->nom }}</strong> {{ $patient->prenom }}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ $patient->telephone }}</small><br>
+                                            <span class="badge bg-light text-dark">{{ $patient->email }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-info">Modifier</button>
+                                                <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Aucun patient enregistré pour le moment.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-</body>
-</html>
+</div>
+@endsection

@@ -10,33 +10,31 @@ class PatientController extends Controller
     /**
      * Affiche la liste des patients.
      */
-    public function index()
-    {
-        $patients = Patient::all();
-        return view('patients', compact('patients'));
-    }
+   public function index()
+{
+    // On récupère tous les patients de la base de données
+    $patients = Patient::all(); 
+    
+    // On les envoie à la vue 'patients'
+    return view('patients', compact('patients'));
+}
 
     /**
      * Enregistre un nouveau patient dans la base de données.
      */
     public function store(Request $request)
-    {
-        // 1. Validation des données
-        $request->validate([
-            'nom_complet' => 'required|string|max:255',
-            'telephone' => 'required|string|max:20',
-            'date_naissance' => 'required|date',
-        ]);
+{
+    // 1. Validation (indispensable pour le prof !)
+    $request->validate([
+        'nom' => 'required|string|max:255',
+        'prenom' => 'required|string|max:255',
+        'email' => 'required|email|unique:patients',
+    ]);
 
-        // 2. Création du patient
-        Patient::create([
-            'nom_complet' => $request->nom_complet,
-            'telephone' => $request->telephone,
-            'date_naissance' => $request->date_naissance,
-            'antecedents_medicaux' => $request->antecedents_medicaux,
-        ]);
+    // 2. Création du patient
+    Patient::create($request->all());
 
-        // 3. Retour à la page avec un message de succès
-        return redirect()->back()->with('success', 'Le patient a été ajouté avec succès !');
-    }
+    // 3. Retour à la page avec un message de succès
+    return redirect()->back()->with('status', 'Patient ajouté avec succès !');
+}
 }

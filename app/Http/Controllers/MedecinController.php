@@ -21,7 +21,10 @@ class MedecinController extends Controller
             'nom' => $request->nom,
             'specialite' => $request->specialite,
             'telephone' => $request->telephone,
+        'email' => 'nullable|email|unique:medecins',
         ]);
+
+        Medecin::create($validated);
 
         return redirect()->back()->with('success', 'Médecin ajouté avec succès !');
     }
